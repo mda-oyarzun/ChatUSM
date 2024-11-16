@@ -1,0 +1,18 @@
+{% extends 'foro/base.html' %}
+
+{% block title %}Eliminar Conversación | ChatUSM{% endblock %}
+
+{% block content %}
+    <h2>Eliminar Tema de Conversación</h2>
+    <a class="link" href="{% url 'detalle_tema' tipo=tema.categoria.tipo tema_id=tema.id %}">Volver al tema</a>
+    <p>Explica las razones por las que deseas eliminar el Tema de Conversación.<p>
+    <p class="detalles">ChatUSM tiene como principal objetivo garantizar la conservación de la información. 
+        No se autorizará la eliminación de Temas que contengan Comentarios y/o Conversaciones que puedan proporcionar
+        información relevante para otros estudiantes. La autorización de la solicitud queda a criterio de los Administradores.</p>
+    <form method="POST" action="{% url 'enviar_solicitud_eliminar_tema' tema_id=tema.id %}">
+        {% csrf_token %}
+        <label for="motivo">Motivo de eliminación:</label>
+        <textarea name="motivo" rows="4" placeholder="Escribe el motivo de eliminación de esta conversación..."></textarea>
+        <button class="button" type="submit">Enviar Solicitud</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'foro/base.html' %}
+{% load static %}
+
+{% block title %}{{ categoria.nombre }} | ChatUSM{% endblock %}
+
+{% block content %}
+    <h2 class="centrar_foro"><a class="link" href="{% url 'categorias_por_tipo' tipo=tema.categoria.tipo %}">{{ categoria.nombre }}</a></h2>
+    <div class="centrar_foro_b like_box">
+        <div>
+            <p class="img_user"><img src="{% static 'imagenes/usuario.png' %}" alt="Foto de {{ tema.autor }}" style="width: 50px; height: auto;">
+                <b class="img_user_marg">{{ tema.autor }}</b> <i class="detalles img_user_marg">{{ tema.fecha_creacion|date:"d.m.Y - H:i" }}</i></p>
+            <h2>{{ tema.titulo }}</h2>
+            <p>{{ tema.contenido }}</p>
+
+            {% if user == tema.autor %}
+                <p>
+                    <a class="link" href="{% url 'enviar_solicitud_eliminar_tema' tema_id=tema.id %}">Eliminar Conversación</a>
+                </p>
+            {% endif %}
+        </div>
+
+        <div>
+            <p>
+                {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'tema_si' tema_id=tema.id %}">
+                        {% csrf_token %}
+                        <button class="voto" type="submit">
+                            <img src="{% static 'imagenes/si.png' %}" alt="SI" /> ({{ tema.si }})
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'tema_no' tema_id=tema.id %}">
+                        {% csrf_token %}
+                        <button class="voto" type="submit">
+                            <img src="{% static 'imagenes/no.png' %}" alt="NO" /> ({{ tema.no }})
+                        </button>
+                {% else %}
+                    <div class="vertical">
+                        <a class="link voto" href="{% url 'login' %}">
+                            <img src="{% static 'imagenes/si.png' %}" alt="SI" />({{ tema.si }})
+                        </a>
+                        <a class="link voto" href="{% url 'login' %}">
+                            <img src="{% static 'imagenes/no.png' %}" alt="NO" />({{ tema.no }})
+                        </a>
+                    </div>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <h3 class="centrar_foro">Comentarios</h3>
+    <ul class="centrar_foro_b">
+        <h3 class="letra_azul"> Agregar un Comentario:</h3>
+        {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'agregar_comentario' tema_id=tema.id %}">
+                {% csrf_token %}
+                <textarea class="buscador" name="contenido" rows="4" placeholder="Escribe tu comentario aquí..."></textarea>
+                <button class="boton" type="submit">Añadir Comentario</button>
+            </form>
+        {% else %}
+            <p>Debes <a class="link" href="{% url 'login' %}">iniciar sesión</a> para agregar un comentario</p>
+        {% endif %}
+        {% for comentario in comentarios %}
+            <li>
+                <div class="comentario_box like_box">
+                    <div>
+                        <p class="img_user"><img src="{% static 'imagenes/usuario.png' %}" alt="Foto de {{ comentario.autor }}" style="width: 50px; height: auto;">
+                            <b class="img_user_marg">{{ comentario.autor.nombre }} {{ comentario.autor.apellido }}:</b> <i class="detalles img_user_marg">{{ comentario.fecha_creacion|date:"d.m.Y - H:i" }}</i></p>
+                        <p>{{ comentario.contenido }}
+                        {% if user == comentario.autor %}
+                            <a class="link" href="{% url 'eliminar_comentario' tipo=tema.categoria.tipo tema_id=tema.id comentario_id=comentario.id %}">Borrar</a>
+                        {% endif %}</p>
+                    </div>
+
+                    <div>
+                        <p>
+                            {% if user.is_authenticated %}
+                                <form method="POST" action="{% url 'comentario_si' comentario_id=comentario.id %}">
+                                    {% csrf_token %}
+                                    <button class="voto" type="submit">
+                                        <img class="img_user_marg" src="{% static 'imagenes/si.png' %}" alt="SI" /> ({{ comentario.si }})
+                                    </button>
+                                </form>
+                                <form method="POST" action="{% url 'comentario_no' comentario_id=comentario.id %}">
+                                    {% csrf_token %}
+                                    <button class="voto" type="submit">
+                                        <img class="img_user_marg" src="{% static 'imagenes/no.png' %}" alt="NO" /> ({{ comentario.no }})
+                                    </button>
+                                </form>
+                            {% else %}
+                                <div class="vertical">
+                                    <a class="voto" href="{% url 'login' %}">
+                                        <img src="{% static 'imagenes/si.png' %}" alt="SI" /> ({{ comentario.si }})
+                                    </a>
+                                    <a class="voto" href="{% url 'login' %}">
+                                        <img src="{% static 'imagenes/no.png' %}" alt="NO" /> ({{ comentario.no }})
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                {% if user.is_authenticated %}
+                    <button class="boton right" id="btn-responder-{{ comentario.id }}" onclick="toggleRespuesta({{ comentario.id }})">Responder</button>
+                    <div id="respuesta-form-{{ comentario.id }}" style="display:none;">
+                        <br>
+                        <form method="POST" action="{% url 'agregar_comentario' tema_id=tema.id %}">
+                            {% csrf_token %}
+                            <textarea class="buscador" name="contenido" rows="2" placeholder="Escribe tu respuesta aquí..."></textarea>
+                            <input type="hidden" name="parent_id" value="{{ comentario.id }}">
+                            <button class="boton" type="submit">Envía tu respuesta</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <a class="boton right" href="{% url 'login' %}">Responder</a>
+                {% endif %}</p>
+
+                <ul>
+                    {% for respuesta in comentario.respuestas.all %}
+                        <li class="centrar_resp">
+                            <b>{{ respuesta.autor.nombre }} {{ respuesta.autor.apellido }}:</b>
+                            <i class="detalles">Responde el comentario de {{ comentario.autor.nombre }} {{ comentario.autor.apellido }}, {{respuesta.fecha_creacion|date:"d.m.Y - H:i"}}</i>
+                            <p>{{ respuesta.contenido }}
+                                {% if user == respuesta.autor %}
+                                    <a class="link" href="{% url 'eliminar_comentario' tipo=tema.categoria.tipo tema_id=tema.id comentario_id=respuesta.id %}">Borrar</a>
+                                {% endif %}
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <br><hr>
+        {% endfor %}
+    </ul>
+    <br>
+{% endblock %}

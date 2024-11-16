@@ -1,0 +1,14 @@
+{% extends 'base_reg.html' %}
+
+{% block content %}
+  <div class="index_fondo">
+    <h1 class="buscar_index_bloque">Iniciar sesión</h1>
+    <div class="buscar_index_bloque">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="button" type="submit">Iniciar sesión</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
