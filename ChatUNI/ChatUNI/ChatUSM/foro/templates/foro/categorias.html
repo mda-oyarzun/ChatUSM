@@ -1,0 +1,43 @@
+{% extends 'foro/base.html' %}
+
+{% block title %}{{ categoria.nombre }} | ChatUSM{% endblock %}
+
+{% block content %}
+    <div class="centrar_foro separador">
+        <h2>{{ categoria.nombre }}</h2>
+        {% if user.is_authenticated %}
+            <a class="boton" href="{% url 'crear_tema' categoria.tipo %}">Agregar un tema</a>
+        {% else %}
+            <p><a class="link" href="{% url 'login' %}">Inicia sesión</a> para agregar un tema</p>
+        {% endif %}
+    </div>
+    <ul class="centrar_foro_b">
+        {% if temas %}
+            {% for tema in temas %}
+                <li class="comentario_box">
+                    <p><a class="tema" href="{% url 'detalle_tema' tipo=categoria.tipo tema_id=tema.id %}">
+                    <b>{{ tema.titulo }}</b> 
+                    <i class="detalles">
+                    {% if tema.anonimo == True %}
+                        Estudiante
+                    {% elif tema.anonimo == False %}
+                        {{ tema.autor }}
+                    {% endif %}
+                    , {{ tema.fecha_creacion|date:"d.m.Y - H:i" }}</i>
+                    <p>{{ tema.contenido|truncatechars:150 }}...
+                    {% if tema.si == 1 %}
+                        <b class="link">{{ tema.si }} voto positivo</b>
+                    {% else %}
+                        <b class="link">{{ tema.si }} votos positivos</b>
+                    {% endif %}
+                    </p></a></p>
+                </li>
+                <hr>
+            {% endfor %}
+        {% else %}
+            <p><h2>¡Todavía no se ha creado un Tema de Conversación en esta Categoría!</h2></p>
+            <p>Se el primero en iniciar una conversación...</p>
+        {% endif %}
+    </ul>
+    <br><br>
+{% endblock %}

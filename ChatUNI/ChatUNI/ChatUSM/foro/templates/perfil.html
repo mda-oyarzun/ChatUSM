@@ -1,0 +1,83 @@
+{% extends 'base_perfil.html' %}
+{% load static %}
+
+{% block title %}Perfil | ChatUSM{% endblock %}
+
+{% block content %}
+    <h1>Perfil de usuario</h1>
+    <div class="info_perfil display_info_perfil">
+        <p class="tooltip">
+            <a href="{% url 'perfil_editar' user.id %}"><img src="{% static 'imagenes/usuario.png' %}" alt="Foto de {{ user.email}}" style="width: 100px; height: auto;"></a>
+            <span class="tooltiptext">Editar datos personales</span>
+        </p>
+        
+        <div class="box_info">
+            <p><b>{{ user.nombre }} {{ user.apellido }}</b> {{ user.email }}</p>
+            <p>{{ user.tipo }}
+            {% if user.tipo.nombre == "Profesor" %}
+                | {{ user.categoria }}
+            {% elif user.tipo.nombre == "Estudiante" %}
+                | {{ user.carrera }}
+            {% endif %}
+            | {{ user.sede }}</p>
+        </div>
+    </div>
+    <p class="separador"><a class="boton" href="{% url 'logout' %}">Cerrar sesión</a></p>
+
+    <p class="display_info_perfil">
+    <a class="link_header" href="{% url 'perfil' %}"> <b class="link">Tus Conversaciones</b></a> |
+    <a class="link_header" href="{% url 'perfil_votos_si' %}">Tus votos positivos</a> | 
+    <a class="link_header" href="{% url 'perfil_votos_no' %}">Tus votos negativos</a></p>
+
+    <div class="display_perfil">
+        <div class="centrar_foro_b">
+            <h2>Temas de Conversación creados ({{cant_temas}})</h2>
+            {% if temas_creados %}
+                <ul>
+                    {% for tema in temas_creados %}
+                        <li class="comentario_box">
+                            <a class="tema" href="{% url 'tema_solicitud' tema.id %}"><b>{{ tema.titulo }}</b>
+                            <i class="detalles">{{ tema.fecha_creacion|date:"d.m.Y - H:i" }}</i>
+                            <br><br>{{ tema.contenido|truncatechars:150 }}...
+                            <br><br>
+                            {% if tema.si == 1 %}
+                                <b class="detalles">{{ tema.si }} voto positivo</b>
+                            {% else %}
+                                <b class="detalles">{{ tema.si }} votos positivos</b>
+                            {% endif %}</a>
+                        </li>
+                        <hr>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Todavía no has creado ningún Tema de Conversación.</p>
+            {% endif %}
+        </div>
+            
+        <div class="centrar_foro_b box_info">
+            <h2>Comentarios creados ({{cant_comentarios}})</h2>
+            {% if comentarios_creados %}
+                <ul>
+                    {% for comentario in comentarios_creados %}
+                        <li class="comentario_box">
+                            <a class="tema" href="{% url 'tema_solicitud' comentario.tema.id %}"><b>{{ comentario.tema.titulo }}</b> 
+                            <i class="detalles">{{ comentario.tema.autor }}</i>
+                            <br><br><b>Comentaste:</b> {{ comentario.contenido|truncatechars:150 }}... <i class="detalles">{{ comentario.fecha_creacion|date:"d.m.Y - H:i" }}</i>
+                            <br><br>
+                            {% if comentario.si == 1 %}
+                                <b class="detalles">{{ comentario.si }} voto positivo</b>
+                            {% else %}
+                                <b class="detalles">{{ comentario.si }} votos positivos</b>
+                            {% endif %}</p></a>
+                        </li>
+                        <hr>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Todavía no has Comentado.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <br>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'foro/base_sin_buscador.html' %}
+
+{% block title %}ADMIN | ChatUSM{% endblock %}
+
+{% block content %}
+    <h2>Tablero Administrativo</h2>
+    <li class="separador"><a class="link" href="{% url 'admin_usuarios' %}">Lista de Usuarios</a></li>
+    <li class="separador"><a class="link" href="{% url 'manejar_solicitudes_eliminar_tema' %}">Solicitudes de Eliminación Temas</a></li> <!-- Terminar admin_solicitudes_eliminacion_tema.html -->
+{% endblock %}

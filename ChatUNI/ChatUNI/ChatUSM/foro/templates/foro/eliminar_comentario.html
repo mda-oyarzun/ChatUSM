@@ -1,0 +1,16 @@
+{% extends 'base_reg.html' %}
+
+{% block title %} Eliminar Comentario | ChatUSM{% endblock %}
+
+{% block content %}
+    <h2 class="centrar_foro">¿Estás seguro de que deseas eliminar este comentario?</h2>
+    <div class="centrar_foro_b">
+        <form method="POST">
+            {% csrf_token %}
+            <p class="detalle">No podrás recuperar el Comentario luego de ser borrado.</p>
+            <button class="boton" type="submit">Eliminar</button>
+            <a class="link" href="{% url 'detalle_tema' tipo=comentario.tema.categoria.tipo tema_id=comentario.tema.id %}">Cancelar</a>
+        </form>
+    </div>
+    <br><br>
+{% endblock %}
